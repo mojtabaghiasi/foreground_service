@@ -244,6 +244,11 @@ class _ForegroundServiceNotification {
     await _invokeMainChannel("setNotificationTitle", <dynamic>[newTitle]);
   }
 
+
+  Future<void> setDayNumber(int day) async {
+    await _invokeMainChannel("setNotificationDay", <dynamic>[day]);
+  }
+
   ///(*see README for warning about notification-related "gets")
   Future<String> getText() async =>
       await _invokeMainChannel("getNotificationText");

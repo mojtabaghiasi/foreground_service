@@ -218,6 +218,11 @@ class ForegroundServicePlugin: FlutterPlugin, MethodCallHandler, IntentService("
 
           //------------------------------
 
+          "setNotificationDay" ->
+            notificationHelper.contentDay = (call.arguments as JSONArray).getInt(0)
+
+          //------------------------------
+
           "startEditNotification"->
             notificationHelper.editModeEnabled = true
 
@@ -605,8 +610,7 @@ class ForegroundServicePlugin: FlutterPlugin, MethodCallHandler, IntentService("
                 .setOnlyAlertOnce(false)
                 .setShowWhen(false)
                 .setSound(null)
-//                .setSmallIcon(getHardcodedIconResourceId())
-                .setSmallIcon(getDayIconResource(23))
+                .setSmallIcon(getHardcodedIconResourceId())
 
         val packageName: String = myAppContext().getPackageName()
         val launchIntent: Intent? = myAppContext().getPackageManager().getLaunchIntentForPackage(packageName)
@@ -731,6 +735,12 @@ class ForegroundServicePlugin: FlutterPlugin, MethodCallHandler, IntentService("
       }
       set(newText){
         builder.setContentText(newText)
+        maybeUpdateNotification()
+      }
+
+    var contentDay: Int = 0
+      set(newDay){
+        builder.setSmallIcon(getDayIconResource(newDay))
         maybeUpdateNotification()
       }
   }
