@@ -1,6 +1,7 @@
 package org.thebus.foreground_service
 
 import android.app.*
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -602,7 +603,18 @@ class ForegroundServicePlugin: FlutterPlugin, MethodCallHandler, IntentService("
                 .setContentText("Running")
                 .setOngoing(true)
                 .setOnlyAlertOnce(false)
-                .setSmallIcon(getHardcodedIconResourceId())
+                .setShowWhen(false)
+                .setSound(null)
+//                .setSmallIcon(getHardcodedIconResourceId())
+                .setSmallIcon(getDayIconResource(23))
+
+        val packageName: String = myAppContext().getPackageName()
+        val launchIntent: Intent? = myAppContext().getPackageManager().getLaunchIntentForPackage(packageName)
+
+        val pendingIntent = PendingIntent.getActivity(myAppContext(),
+                0,launchIntent,PendingIntent.FLAG_UPDATE_CURRENT)
+
+        newBuilder.setContentIntent(pendingIntent)
 
         //the "normal" setPriority method will try to rebuild/renotify
         //which of course isn't going to end well since the builder hasn't been set yet
@@ -639,6 +651,21 @@ class ForegroundServicePlugin: FlutterPlugin, MethodCallHandler, IntentService("
 
       newBuilder
     }
+
+
+    fun getDayIconResource(day: Int): Int = try {
+      when (preferredDigits) {
+        ARABIC_DIGITS -> DAYS_ICONS_ARABIC[day]
+        ARABIC_INDIC_DIGITS -> DAYS_ICONS_ARABIC_INDIC[day]
+        else -> DAYS_ICONS_PERSIAN[day]
+      }
+    } catch (e: IndexOutOfBoundsException) {
+      Log.e(TAG, "No such field is available", e)
+      0
+    }
+
+      var preferredDigits = PERSIAN_DIGITS
+          private set
 
     //this is a doozy, so do this in order to allow a default value to be set intially
     //without needing to duplicate code, or manually injecting the same builder everwhere
